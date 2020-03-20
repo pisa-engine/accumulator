@@ -2,25 +2,25 @@
 
 #include <cmath>
 #include <vector>
-#include "utils.hpp"
+#include "detail/detail.hpp"
 
-namespace acc {
+namespace accumulator {
 
-template <typename T> class Accumulator2D {
+template <typename T> class Paged {
 
   static_assert(std::is_arithmetic<T>::value,
                 "Accumulator requires arithmetic elements.");
 
 public:
-  explicit Accumulator2D(size_t size)
+  explicit Paged(size_t size)
       : m_log_block_size(std::floor(std::log2(sqrt(size)))),
-        m_block_size(size_t(1) << m_log_block_size), {
+        m_block_size(size_t(1) << m_log_block_size) {
     auto blocks_number = std::ceil(size / m_block_size);
     m_clean_flag.resize(blocks_number, false);
     accumulator.resize(m_block_size * blocks_number);
   }
 
-  [[nodiscard]] __ALWAYSINLINE T &operator[](size_t position) {
+  [[nodiscard]] ACC_ALWAYSINLINE T &operator[](size_t position) {
     size_t block = position >> m_log_block_size;
     if (not m_clean_flag[block]) {
       auto skip = block * m_block_size;
@@ -31,7 +31,7 @@ public:
     return accumulator[position];
   }
 
-  [[nodiscard]] __ALWAYSINLINE size_t size() const {
+  [[nodiscard]] ACC_ALWAYSINLINE size_t size() const {
     return accumulator.size();
   }
 
@@ -40,7 +40,7 @@ public:
 private:
   std::vector<uint8_t> m_clean_flag;
   std::vector<T> accumulator;
-  size_t m_block_size;
   size_t m_log_block_size;
+  size_t m_block_size;
 };
 } // namespace acc

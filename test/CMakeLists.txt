@@ -4,17 +4,14 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../external/Catch2/con
 include(CTest)
 include(Catch)
 
-file(GLOB TEST_SOURCES test_*.cpp)
-foreach(TEST_SRC ${TEST_SOURCES})
-  get_filename_component (TEST_SRC_NAME ${TEST_SRC} NAME_WE)
-  add_executable(${TEST_SRC_NAME} ${TEST_SRC})
-  target_link_libraries(${TEST_SRC_NAME}
-    Catch2
-    )
-  catch_discover_tests(${TEST_SRC_NAME} TEST_PREFIX "${TEST_SRC_NAME}:")
+add_executable(test_accumulator test_accumulator.cpp)
+target_link_libraries(test_accumulator
+Catch2
+rapidcheck
+accumulator
+)
+catch_discover_tests(test_accumulator TEST_PREFIX "test_accumulator:")
 
-  # enable code coverage
-  add_coverage(${TEST_SRC_NAME})
-endforeach(TEST_SRC)
+# enable code coverage
+add_coverage(test_accumulator)
 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test_data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

@@ -5,3 +5,6 @@ EXECUTE_PROCESS(COMMAND git submodule update --init
 
 # Add Catch
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Catch2)
+# Add RapidCheck
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/rapidcheck)
+target_compile_options(rapidcheck PRIVATE -Wno-error=all)

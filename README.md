@@ -1,4 +1,4 @@
-# Cpp Skeleton
+# Accumulator
 
-A skeleton for C++ projects using CMake, Catch2 and code coverage.
+Benchmarking several score accumulators used in IR.
 

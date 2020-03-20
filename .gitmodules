@@ -4,3 +4,9 @@
 [submodule "external/CMake-codecov"]
 	path = external/CMake-codecov
 	url = https://github.com/RWTH-HPC/CMake-codecov.git
+[submodule "rapidcheck"]
+	path = rapidcheck
+	url = https://github.com/emil-e/rapidcheck.git
+[submodule "external/rapidcheck"]
+	path = external/rapidcheck
+	url = https://github.com/emil-e/rapidcheck.git
