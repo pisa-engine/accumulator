@@ -10,13 +10,13 @@
 using namespace accumulator;
 
 template <typename Accumulator, typename T>
-static void test(Accumulator &instance, std::vector<T> const &elements)
+static void test(Accumulator& instance, std::vector<T> const& elements)
 {
     for (size_t position = 0; position < instance.size(); ++position) {
         REQUIRE(instance[position] == 0);
     }
 
-    for (const auto &element : elements) {
+    for (const auto& element: elements) {
         instance[element] = element;
     }
 
@@ -33,7 +33,6 @@ static void test(Accumulator &instance, std::vector<T> const &elements)
 
 TEST_CASE("Paged")
 {
-
     auto shuffled_iota_vector = [](size_t size) {
         std::vector<size_t> elements(size);
         std::iota(elements.begin(), elements.end(), 0);
