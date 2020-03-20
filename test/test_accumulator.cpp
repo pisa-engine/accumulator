@@ -20,7 +20,7 @@ static void test(Accumulator& instance, std::vector<T> const& elements)
         instance[element] = element;
     }
 
-    auto elements_set = std::unordered_set(elements.begin(), elements.end());
+    std::unordered_set<T> elements_set(elements.begin(), elements.end());
 
     for (size_t position = 0; position < instance.size(); ++position) {
         if (elements_set.count(position)) {
