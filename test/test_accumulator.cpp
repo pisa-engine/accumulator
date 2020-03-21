@@ -3,30 +3,28 @@
 
 #include <cassert>
 #include <random>
-#include <rapidcheck.h>
+#include <vector>
 
 #include "Paged.hpp"
+#include <rapidcheck.h>
 
 using namespace accumulator;
 
 template <typename Accumulator, typename T>
-static void test(Accumulator& instance, std::vector<T> const& elements)
+static void test(Accumulator& accumulator, std::vector<T> const& elements)
 {
-    for (size_t position = 0; position < instance.size(); ++position) {
-        REQUIRE(instance[position] == 0);
+    for (size_t position = 0; position < accumulator.size(); ++position) {
+        REQUIRE(accumulator[position] == 0);
     }
-
-    for (const auto& element: elements) {
-        instance[element] = element;
+    for (auto&& i: elements) {
+        accumulator[i] = i;
     }
-
     std::unordered_set<T> elements_set(elements.begin(), elements.end());
-
-    for (size_t position = 0; position < instance.size(); ++position) {
+    for (size_t position = 0; position < accumulator.size(); ++position) {
         if (elements_set.count(position)) {
-            REQUIRE(instance[position] == position);
+            REQUIRE(accumulator[position] == position);
         } else {
-            REQUIRE(instance[position] == 0);
+            REQUIRE(accumulator[position] == 0);
         }
     }
 }
@@ -36,11 +34,11 @@ TEST_CASE("Paged")
     auto shuffled_iota_vector = [](size_t size) {
         std::vector<size_t> elements(size);
         std::iota(elements.begin(), elements.end(), 0);
-        std::random_device random_number_generator;
-        std::shuffle(elements.begin(), elements.end(), std::knuth_b(random_number_generator()));
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(elements.begin(), elements.end(), g);
         return elements;
     };
-
     SECTION("64 accumulators")
     {
         Paged<size_t> accumulator(64);
@@ -67,10 +65,13 @@ TEST_CASE("Paged")
     }
     SECTION("Random")
     {
-        rc::check([](std::vector<size_t> elements) {
-            std::sort(elements.begin(), elements.end());
-            Paged<size_t> accumulator(elements.size() ? 0 : elements.back());
-            test(accumulator, elements);
+        rc::check([]() {
+            auto elements = *rc::gen::unique<std::vector<size_t>>(rc::gen::inRange(0, 1'000'000));
+            if (elements.size()) {
+                std::sort(elements.begin(), elements.end());
+                Paged<size_t> accumulator(elements.back() + 1);
+                test(accumulator, elements);
+            }
         });
     }
 }

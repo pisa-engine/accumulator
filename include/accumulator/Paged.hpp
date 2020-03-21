@@ -12,10 +12,10 @@ class Paged {
 
   public:
     explicit Paged(size_t size)
-        : m_log_block_size(std::floor(std::log2(sqrt(size)))),
+        : m_log_block_size(std::floor(std::log2(size_t(sqrt(size))))),
           m_block_size(size_t(1) << m_log_block_size)
     {
-        auto blocks_number = std::ceil(size / m_block_size);
+        auto blocks_number = std::ceil(float(size) / m_block_size);
         m_clean_flag.resize(blocks_number, false);
         accumulator.resize(m_block_size * blocks_number);
     }
