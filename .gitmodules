@@ -10,3 +10,6 @@
 [submodule "external/rapidcheck"]
 	path = external/rapidcheck
 	url = https://github.com/emil-e/rapidcheck.git
+[submodule "external/nanobench"]
+	path = external/nanobench
+	url = https://github.com/martinus/nanobench.git

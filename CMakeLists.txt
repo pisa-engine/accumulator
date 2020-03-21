@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-option(ACCUMULATORS_ENABLE_TESTING "Enable testing of the library." ON)
+option(ACCUMULATOR_ENABLE_TESTING "Enable testing of the library." ON)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release")
@@ -34,7 +34,7 @@ target_include_directories(accumulator INTERFACE external)
 
 add_subdirectory(benchmark)
 
-if (ACCUMULATORS_ENABLE_TESTING AND BUILD_TESTING)
+if (ACCUMULATOR_ENABLE_TESTING AND BUILD_TESTING)
     enable_testing()
     add_subdirectory(test)
 endif()
