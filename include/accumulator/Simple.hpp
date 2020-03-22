@@ -1,6 +1,7 @@
 #pragma once
 
 #include "detail/detail.hpp"
+#include <algorithm>
 #include <cmath>
 #include <vector>
 
