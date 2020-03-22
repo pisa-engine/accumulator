@@ -5,19 +5,28 @@
 #include <random>
 #include <vector>
 
+#include "MaxBlock.hpp"
 #include "Paged.hpp"
+#include "Simple.hpp"
+
 #include <rapidcheck.h>
 
 using namespace accumulator;
 
-template <typename Accumulator, typename T>
-static void test(Accumulator& accumulator, std::vector<T> const& elements)
+template <typename Accumulator>
+void check_is_empty(Accumulator const& accumulator)
 {
     for (size_t position = 0; position < accumulator.size(); ++position) {
         REQUIRE(accumulator[position] == 0);
     }
+}
+
+template <typename Accumulator, typename T>
+static void test(Accumulator& accumulator, std::vector<T> const& elements)
+{
+    check_is_empty(accumulator);
     for (auto&& i: elements) {
-        accumulator[i] = i;
+        accumulator.accumulate(i, i);
     }
     std::unordered_set<T> elements_set(elements.begin(), elements.end());
     for (size_t position = 0; position < accumulator.size(); ++position) {
@@ -27,9 +36,13 @@ static void test(Accumulator& accumulator, std::vector<T> const& elements)
             REQUIRE(accumulator[position] == 0);
         }
     }
+
+    accumulator.clear();
+    check_is_empty(accumulator);
 }
 
-TEST_CASE("Paged")
+template <typename Accumulator>
+void perf_test()
 {
     auto shuffled_iota_vector = [](size_t size) {
         std::vector<size_t> elements(size);
@@ -41,25 +54,25 @@ TEST_CASE("Paged")
     };
     SECTION("64 accumulators")
     {
-        Paged<size_t> accumulator(64);
+        Accumulator accumulator(64);
         auto elements = shuffled_iota_vector(64);
         test(accumulator, elements);
     }
     SECTION("Only 1 accumulator in last block")
     {
-        Paged<size_t> accumulator(65);
+        Accumulator accumulator(65);
         auto elements = shuffled_iota_vector(65);
         test(accumulator, elements);
     }
     SECTION("Missing 1 accumulator in last block")
     {
-        Paged<size_t> accumulator(63);
+        Accumulator accumulator(63);
         auto elements = shuffled_iota_vector(63);
         test(accumulator, elements);
     }
     SECTION("Single block")
     {
-        Paged<size_t> accumulator(1);
+        Accumulator accumulator(1);
         auto elements = shuffled_iota_vector(1);
         test(accumulator, elements);
     }
@@ -69,9 +82,24 @@ TEST_CASE("Paged")
             auto elements = *rc::gen::unique<std::vector<size_t>>(rc::gen::inRange(0, 1'000'000));
             if (elements.size()) {
                 std::sort(elements.begin(), elements.end());
-                Paged<size_t> accumulator(elements.back() + 1);
+                Accumulator accumulator(elements.back() + 1);
                 test(accumulator, elements);
             }
         });
     }
+}
+
+TEST_CASE("Simple")
+{
+    perf_test<Simple<size_t>>();
+}
+
+TEST_CASE("Paged")
+{
+    perf_test<Paged<size_t>>();
+}
+
+TEST_CASE("MaxBlock")
+{
+    perf_test<MaxBlock<size_t>>();
 }
