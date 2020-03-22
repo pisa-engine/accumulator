@@ -5,6 +5,7 @@
 #include <random>
 #include <vector>
 
+#include "Counter.hpp"
 #include "MaxBlock.hpp"
 #include "Paged.hpp"
 #include "Simple.hpp"
@@ -102,4 +103,9 @@ TEST_CASE("Paged")
 TEST_CASE("MaxBlock")
 {
     perf_test<MaxBlock<size_t>>();
+}
+
+TEST_CASE("Counter")
+{
+    perf_test<Counter<size_t>>();
 }

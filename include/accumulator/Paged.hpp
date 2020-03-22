@@ -23,7 +23,7 @@ class Paged: public Simple<T> {
         m_clean_flag.resize(blocks_number, true);
     }
 
-    void accumulate(size_t position, T value)
+    ACC_ALWAYSINLINE void accumulate(size_t position, T value)
     {
         size_t block = position >> m_log_block_size;
         if (not m_clean_flag[block]) {
@@ -48,7 +48,7 @@ class Paged: public Simple<T> {
 
     using Simple<T>::size;
 
-    void clear() { std::fill(m_clean_flag.begin(), m_clean_flag.end(), false); }
+    ACC_ALWAYSINLINE void clear() { std::fill(m_clean_flag.begin(), m_clean_flag.end(), false); }
 
     template <typename Topk>
     void aggregate(Topk& topk)

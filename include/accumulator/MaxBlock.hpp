@@ -15,7 +15,7 @@ class MaxBlock: public Paged<T> {
         m_block_max.resize(Paged<T>::m_clean_flag.size(), 0);
     }
 
-    void accumulate(size_t position, T value)
+    ACC_ALWAYSINLINE void accumulate(size_t position, T value)
     {
         size_t block = position >> Paged<T>::m_log_block_size;
         if (not Paged<T>::m_clean_flag[block]) {

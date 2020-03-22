@@ -14,7 +14,7 @@ class Simple {
   public:
     explicit Simple(size_t size) { accumulator.resize(size); }
 
-    void accumulate(size_t position, T value) { accumulator[position] = value; }
+    ACC_ALWAYSINLINE void accumulate(size_t position, T value) { accumulator[position] = value; }
 
     [[nodiscard]] ACC_ALWAYSINLINE T const& operator[](size_t position) const
     {
@@ -23,7 +23,7 @@ class Simple {
 
     [[nodiscard]] ACC_ALWAYSINLINE size_t size() const { return accumulator.size(); }
 
-    void clear() { std::fill(accumulator.begin(), accumulator.end(), 0); }
+    ACC_ALWAYSINLINE void clear() { std::fill(accumulator.begin(), accumulator.end(), 0); }
 
     template <typename Topk>
     void aggregate(Topk& topk)

@@ -1,11 +1,14 @@
 #define ANKERL_NANOBENCH_IMPLEMENT
-#include "MaxBlock.hpp"
-#include "Paged.hpp"
-#include "Simple.hpp"
 #include <algorithm>
 #include <nanobench.h>
 #include <random>
 #include <string>
+
+#include "Counter.hpp"
+#include "MaxBlock.hpp"
+#include "Paged.hpp"
+#include "Simple.hpp"
+
 template <typename Accumulator>
 void bench_clear(std::string const& name, size_t iterations)
 {
@@ -56,11 +59,12 @@ void bench_accumulate(std::string const& name, size_t iterations)
 int main(int argc, char const* argv[])
 {
     using namespace accumulator;
-    // bench_clear<Simple<size_t>>("Simple", 1'000);
-    // bench_clear<Paged<size_t>>("Paged", 10'000'000);
-    // bench_clear<MaxBlock<size_t>>("MaxBlock", 10'000'000);
+    bench_clear<Simple<size_t>>("Simple", 1'000);
+    bench_clear<Paged<size_t>>("Paged", 10'000'000);
+    bench_clear<MaxBlock<size_t>>("MaxBlock", 10'000'000);
 
-    bench_accumulate<Simple<size_t>>("Simple", 500);
-    bench_accumulate<Paged<size_t>>("Paged", 500);
-    bench_accumulate<MaxBlock<size_t>>("MaxBlock", 500);
+    bench_accumulate<Simple<size_t>>("Simple", 100);
+    bench_accumulate<Paged<size_t>>("Paged", 100);
+    bench_accumulate<MaxBlock<size_t>>("MaxBlock", 100);
+    bench_accumulate<Counter<size_t>>("Counter", 100);
 }
