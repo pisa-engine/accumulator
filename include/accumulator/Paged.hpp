@@ -4,6 +4,7 @@
 #include "detail/detail.hpp"
 #include <cmath>
 #include <vector>
+#include <cstdint>
 
 namespace accumulator {
 
