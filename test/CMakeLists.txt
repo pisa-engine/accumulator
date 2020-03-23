@@ -9,6 +9,7 @@ target_link_libraries(test_accumulator
 Catch2
 rapidcheck
 accumulator
+nanobench
 )
 catch_discover_tests(test_accumulator TEST_PREFIX "test_accumulator:")
 

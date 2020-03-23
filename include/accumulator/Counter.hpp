@@ -36,7 +36,7 @@ struct Counter: public Simple<T> {
     void aggregate(Topk& topk)
     {
         size_t position = 0;
-        for (auto&& value: Simple<T>::m_accumulators) {
+        for (auto&& value: Simple<T>::m_accumulator) {
             if (m_descriptor[position] == m_counter) {
                 topk.insert(value, position);
             }

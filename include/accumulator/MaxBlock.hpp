@@ -22,8 +22,8 @@ class MaxBlock: public Paged<T> {
             m_block_max[block] = 0;
             auto skip = block * Paged<T>::m_block_size;
             std::fill(
-                Simple<T>::accumulator.begin() + skip,
-                Simple<T>::accumulator.begin() + skip + Paged<T>::m_block_size,
+                Simple<T>::m_accumulator.begin() + skip,
+                Simple<T>::m_accumulator.begin() + skip + Paged<T>::m_block_size,
                 0);
             Paged<T>::m_clean_flag[block] = true;
         }
@@ -44,10 +44,10 @@ class MaxBlock: public Paged<T> {
         for (auto&& clean: Paged<T>::m_clean_flag) {
             if (clean and topk.would_enter(m_block_max[block])) {
                 auto skip = block * Paged<T>::m_block_size;
-                auto end = std::max(skip + Paged<T>::m_block_size, Paged<T>::size());
+                auto end = std::min(skip + Paged<T>::m_block_size, Paged<T>::size());
                 std::for_each(
-                    Simple<T>::accumulator.begin() + skip,
-                    Simple<T>::accumulator.begin() + end,
+                    Simple<T>::m_accumulator.begin() + skip,
+                    Simple<T>::m_accumulator.begin() + end,
                     [&](auto value) {
                         topk.insert(value, position);
                         position += 1;

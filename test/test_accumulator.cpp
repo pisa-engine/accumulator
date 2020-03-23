@@ -1,5 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch2/catch.hpp"
+#include <algorithm>
+#include <nanobench.h>
 
 #include <cassert>
 #include <random>
@@ -14,6 +16,27 @@
 
 using namespace accumulator;
 
+template <typename T>
+struct TopkMock {
+    explicit TopkMock(size_t k) : m_k(k) {}
+
+    void insert(T const& v, size_t const& p)
+    {
+        values.push_back(v);
+        ankerl::nanobench::doNotOptimizeAway(p);
+    }
+    bool would_enter(T const& v) { return true; }
+
+    auto topk(size_t end)
+    {
+        std::sort(values.begin(), values.end(), std::greater<T>());
+        return std::vector<T>(values.begin(), values.begin() + end);
+    }
+
+    std::vector<T> values;
+    size_t m_k;
+};
+
 template <typename Accumulator>
 void check_is_empty(Accumulator const& accumulator)
 {
@@ -23,7 +46,7 @@ void check_is_empty(Accumulator const& accumulator)
 }
 
 template <typename Accumulator, typename T>
-static void test(Accumulator& accumulator, std::vector<T> const& elements)
+static void test(Accumulator& accumulator, std::vector<T>& elements)
 {
     check_is_empty(accumulator);
     for (auto&& i: elements) {
@@ -37,6 +60,12 @@ static void test(Accumulator& accumulator, std::vector<T> const& elements)
             REQUIRE(accumulator[position] == 0);
         }
     }
+
+    TopkMock<T> topk(10);
+    accumulator.aggregate(topk);
+    std::sort(elements.begin(), elements.end(), std::greater<T>());
+    auto end = std::min(elements.size(), topk.m_k);
+    CHECK(topk.topk(end) == std::vector<T>(elements.begin(), elements.begin() + end));
 
     accumulator.clear();
     check_is_empty(accumulator);

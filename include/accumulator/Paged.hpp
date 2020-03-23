@@ -3,8 +3,8 @@
 #include "Simple.hpp"
 #include "detail/detail.hpp"
 #include <cmath>
-#include <vector>
 #include <cstdint>
+#include <vector>
 
 namespace accumulator {
 
@@ -29,8 +29,8 @@ class Paged: public Simple<T> {
         if (not m_clean_flag[block]) {
             auto skip = block * m_block_size;
             std::fill(
-                Simple<T>::accumulator.begin() + skip,
-                Simple<T>::accumulator.begin() + skip + m_block_size,
+                Simple<T>::m_accumulator.begin() + skip,
+                Simple<T>::m_accumulator.begin() + skip + m_block_size,
                 0);
             m_clean_flag[block] = true;
         }
@@ -53,16 +53,15 @@ class Paged: public Simple<T> {
     template <typename Topk>
     void aggregate(Topk& topk)
     {
-        // TODO: need to be checked
         size_t block = 0;
         size_t position = 0;
         for (auto&& clean: m_clean_flag) {
             if (clean) {
                 auto skip = block * m_block_size;
-                auto end = std::max(skip + m_block_size, size());
+                auto end = std::min(skip + m_block_size, size());
                 std::for_each(
-                    Simple<T>::accumulator.begin() + skip,
-                    Simple<T>::accumulator.begin() + end,
+                    Simple<T>::m_accumulator.begin() + skip,
+                    Simple<T>::m_accumulator.begin() + end,
                     [&](auto value) {
                         topk.insert(value, position);
                         position += 1;
