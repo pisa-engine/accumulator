@@ -44,7 +44,7 @@ void bench_clear(std::string const& name, size_t iterations)
     for (auto&& power: {16, 18, 20, 25}) {
         auto size = std::pow(2, power);
         Accumulator accumulator(size);
-        ankerl::nanobench::Bench()
+        ankerl::nanobench::Bench().title("Clear")
             .minEpochIterations(iterations)
             .run(
                 "Clear " + name + " accumulator of size 2^{" + std::to_string(power) + "}",
@@ -64,7 +64,7 @@ void bench_accumulate(std::string const& name, size_t iterations)
         std::generate(
             elements.begin(), elements.end(), RandomNumberBetween(size_t(0), size_t(size - 1)));
         Accumulator accumulator(size);
-        ankerl::nanobench::Bench()
+        ankerl::nanobench::Bench().title("Accumulate")
             .minEpochIterations(iterations)
             .run(
                 "Accumulate elements in " + name + " accumulator of size 2^{"
@@ -95,7 +95,7 @@ void bench_aggregate(std::string const& name, size_t iterations)
         std::sort(elements.begin(), elements.end(), std::greater<T>());
         auto end = std::min(elements.size(), size_t(10));
         auto threshold = elements[end];
-        ankerl::nanobench::Bench()
+        ankerl::nanobench::Bench().title("Aggregate")
             .minEpochIterations(iterations)
             .run(
                 "Aggregate elements in " + name + " accumulator of size 2^{" + std::to_string(power)
