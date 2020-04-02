@@ -10,23 +10,22 @@ template <typename T>
 struct Counter: public Simple<T> {
     static constexpr size_t cycle = size_t(1) << 8;
 
-    Counter(std::size_t size) : Simple<T>(size), m_default_value(0)
-    {
-        m_descriptor.resize(size, 0);
-    }
+    Counter(std::size_t size) : Simple<T>(2 * size), m_default_value(0) {}
 
     ACC_ALWAYSINLINE void accumulate(size_t position, T value)
     {
-        if (m_descriptor[position] != m_counter) {
-            m_descriptor[position] = m_counter;
+        auto pos = position << 1;
+        if (Simple<T>::operator[](pos) != m_counter) {
+            Simple<T>::accumulate(pos, m_counter);
         }
-        Simple<T>::accumulate(position, value);
+        Simple<T>::accumulate(pos + 1, value);
     }
 
     [[nodiscard]] ACC_ALWAYSINLINE T const& operator[](size_t position) const
     {
-        if (m_descriptor[position] == m_counter) {
-            return Simple<T>::operator[](position);
+        auto pos = position << 1;
+        if (Simple<T>::operator[](pos) == m_counter) {
+            return Simple<T>::operator[](pos + 1);
         } else {
             return m_default_value;
         }
@@ -36,27 +35,25 @@ struct Counter: public Simple<T> {
     void aggregate(Topk& topk)
     {
         size_t position = 0;
-        for (auto&& value: Simple<T>::m_accumulator) {
-            if (m_descriptor[position] == m_counter) {
-                topk.insert(value, position);
+        for (size_t pos = 0; pos < Simple<T>::m_accumulator.size(); pos += 2) {
+            if (Simple<T>::operator[](pos) == m_counter) {
+                topk.insert(Simple<T>::operator[](pos + 1), position);
             }
-            position += 1;
         }
     }
 
-    using Simple<T>::size;
+    [[nodiscard]] ACC_ALWAYSINLINE size_t size() const { return Simple<T>::size() / 2; }
 
     ACC_ALWAYSINLINE void clear()
     {
         m_counter = (m_counter + 1) % cycle;
         if (m_counter == 0) {
-            std::fill(m_descriptor.begin(), m_descriptor.end(), m_counter - 1);
+            Simple<T>::clear();
         }
     }
 
   private:
     T m_default_value;
-    std::vector<uint8_t> m_descriptor;
     uint8_t m_counter{};
-};  // namespace accumulator
+};
 }  // namespace accumulator
